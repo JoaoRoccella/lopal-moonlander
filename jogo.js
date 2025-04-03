@@ -4,7 +4,7 @@
     GitHub: https://github.com/joaoroccella
     Email: joao.a@docente.senai.br
     Versão: 0.1.0 
-    Lander: <a href="https://www.flaticon.com/br/icones-gratis/lander" title="lander ícones">Lander ícones criados por wanicon - Flaticon</a>
+    Lander: https://www.flaticon.com/br/icones-gratis/lander
 */
 
 /** @type {HTMLCanvasElement} */
