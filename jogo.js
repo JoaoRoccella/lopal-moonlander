@@ -14,13 +14,15 @@
 let canvas = document.querySelector('#jogo');
 let contexto = canvas.getContext('2d');
 
+let inversao = Boolean(Date.now() % 2);
+
 let configuracao = {
     posicaoInicialModuloLunar: {
-        x: 300,
+        x: inversao ? 700 : 100,
         y: 100
     },
     velocidadeInicialModuloLunar: {
-        x: 0,
+        x: inversao ? -3 : 3,
         y: 0
     },
     combustivelInicialModuloLunar: 1000,
@@ -31,7 +33,6 @@ let configuracao = {
     teclaRotacaoPositiva: 39,
 }
 
-let inversao = Boolean(Date.now() % 2);
 let colisao = false;
 let jogoAtivo = true;
 let estrelas = criarEstrelas();
@@ -218,17 +219,21 @@ function finalizarJogo() {
     moduloLunar.angulo = colisao ? moduloLunar.angulo : 0;
 
     colisao = false;
+    jogoAtivo = true;
 }
 
 function reiniciarJogo() {
 
-    window.location.reload();
+    jogoAtivo = true;
 
-    moduloLunar.posicao = { x: 400, y: 100 };
-    moduloLunar.velocidade = { x: 0, y: 0 };
-    moduloLunar.combustivel = configuracao.combustivelInicialModuloLunar;
+    configuracao.aceleracaoGravidadeLunar = 0.016;
+    moduloLunar.posicao.x = inversao ? 700 : 100;
+    moduloLunar.posicao.y = 100;
+    moduloLunar.velocidade.x = inversao ? -3 : 3;
+    moduloLunar.velocidade.y = 0;
+    moduloLunar.combustivel = 1000;
     moduloLunar.motorLigado = false;
-    moduloLunar.angulo = configuracao.anguloInicialModuloLunar;
+    moduloLunar.angulo = Math.PI * (inversao ? .5 : -.5);
     moduloLunar.rotacaoNegativa = false;
     moduloLunar.rotacaoPositiva = false;
 
@@ -348,6 +353,10 @@ function teclaPressionada(evento) {
     // Pressionando a tecla "seta à direita" para rotacionar positivamente
     else if (evento.keyCode === configuracao.teclaRotacaoPositiva) {
         moduloLunar.rotacaoPositiva = true;
+    }
+
+    else if (evento.keyCode === 13) {
+        reiniciarJogo();
     }
 
 }
