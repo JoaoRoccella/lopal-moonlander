@@ -81,7 +81,7 @@ function desenharEstrelas(estrelas) {
         contexto.beginPath();
         contexto.arc(estrela.x, estrela.y, estrela.raio, 0, 2 * Math.PI);
         contexto.closePath();
-        contexto.fillStyle = `rgba(0, 255, 255, ${estrela.brilho})`;
+        contexto.fillStyle = `rgba(255, 0, 255, ${estrela.brilho})`;
         contexto.fill();
 
         if (estrela.apagando) {
