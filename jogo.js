@@ -31,6 +31,7 @@ let configuracao = {
     teclaAceleracao: 38,
     teclaRotacaoNegativa: 37,
     teclaRotacaoPositiva: 39,
+    pontuacaoMaxima: 0,
 }
 
 let colisao = false;
@@ -69,7 +70,7 @@ function criarEstrelas() {
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
             raio: Math.sqrt(Math.random() * 2),
-            transparencia: .95,
+            transparencia: .55,
             diminuicao: true,
             razaoDeCintilacao: Math.random() * 0.05
         };
@@ -166,8 +167,8 @@ function detectarContato() {
 
         } else {
             
-            mensagemVitoria();
-
+            const pontuacao = calcularPontuacao(moduloLunar);
+            mensagemVitoria(pontuacao);
 
         }
         jogoAtivo = false;
@@ -191,21 +192,18 @@ function obterDadosAlunissagem(moduloLunar) {
 function calcularPontuacao(moduloLunar) {
 
     const dadosAlunissagem = obterDadosAlunissagem(moduloLunar);
-
     const pontuacaoInicial = 1000;
     let pontuacaoJogador = pontuacaoInicial;
 
-    console.log(pontuacaoJogador);
     pontuacaoJogador -= Math.abs(Math.round(dadosAlunissagem.velocidadeFinal.x * 1000));
-    console.log(pontuacaoJogador);
     pontuacaoJogador -= Math.abs(Math.round(dadosAlunissagem.velocidadeFinal.y * 1000));
-    console.log(pontuacaoJogador);
     pontuacaoJogador -= Math.abs(Math.round(moduloLunar.angulo * 1800 / Math.PI) % 360);
-    console.log(pontuacaoJogador);
     pontuacaoJogador += Math.abs(Math.round(dadosAlunissagem.combustivel));
-    console.log(pontuacaoJogador);
 
-    return pontuacaoJogador;
+    return {
+        pontuacao: pontuacaoJogador,
+        novoRecorde: pontuacaoJogador > configuracao.pontuacaoMaxima
+    };
 
 }
 
@@ -219,13 +217,12 @@ function finalizarJogo() {
     moduloLunar.angulo = colisao ? moduloLunar.angulo : 0;
 
     colisao = false;
-    jogoAtivo = true;
 }
 
-function reiniciarJogo() {
+function iniciarJogo() {
 
-    jogoAtivo = true;
-
+    inversao = Boolean(Date.now() % 2);
+    
     configuracao.aceleracaoGravidadeLunar = 0.016;
     moduloLunar.posicao.x = inversao ? 700 : 100;
     moduloLunar.posicao.y = 100;
@@ -236,6 +233,10 @@ function reiniciarJogo() {
     moduloLunar.angulo = Math.PI * (inversao ? .5 : -.5);
     moduloLunar.rotacaoNegativa = false;
     moduloLunar.rotacaoPositiva = false;
+    
+    colisao = false;
+    jogoAtivo = true;
+    desenharTela();
 
 }
 
@@ -251,7 +252,7 @@ function desenharChama() {
 }
 
 function mostrarVelocidade() {
-    contexto.font = "bold 18px Arial";
+    contexto.font = "bold 18px Consolas";
     contexto.textBaseline = "middle";
     contexto.fillStyle = "lightgray";
     let velocidade = `Velocidade: V: ${Math.abs(Math.round(10 * moduloLunar.velocidade.y))} m/s | H: ${Math.abs(Math.round(10 * moduloLunar.velocidade.x))} m/s`;
@@ -259,7 +260,7 @@ function mostrarVelocidade() {
 }
 
 function mostrarCombustivel() {
-    contexto.font = "bold 18px Arial";
+    contexto.font = "bold 18px Consolas";
     contexto.textBaseline = "middle";
     contexto.fillStyle = "lightgray";
     let combustivel = `Combustível: ${Math.round(moduloLunar.combustivel / configuracao.combustivelInicialModuloLunar * 100)} %`;
@@ -267,7 +268,7 @@ function mostrarCombustivel() {
 }
 
 function mostrarAngulo() {
-    contexto.font = "bold 18px Arial";
+    contexto.font = "bold 18px Consolas";
     contexto.textBaseline = "middle";
     contexto.fillStyle = "lightgray";
     let angulo = `Ângulo: ${Math.abs(Math.round(moduloLunar.angulo * 180 / Math.PI) % 360)} °`;
@@ -275,23 +276,48 @@ function mostrarAngulo() {
 }
 
 function mostrarAltitude() {
-    contexto.font = "bold 18px Arial";
+    contexto.font = "bold 18px Consolas";
     contexto.textBaseline = "middle";
     contexto.fillStyle = "lightgray";
     let angulo = `Altitude: ${Math.abs(Math.round(canvas.height - moduloLunar.posicao.y - (moduloLunar.altura * .5)))} m`;
     contexto.fillText(angulo, 40, 100);
 }
 
-function mensagemVitoria() {
+function mostrarPontuacao() {
+    
     contexto.save();
+
+    contexto.font = "bold 18px Consolas";
+    contexto.textBaseline = "middle";
+    contexto.fillStyle = "lightgray";
+    contexto.textAlign = "right";
+    
+    let pontuacaoMaxima = `Recorde: ${configuracao.pontuacaoMaxima}`;
+    contexto.fillText(pontuacaoMaxima, 760, 40);
+
+    contexto.restore();
+}
+
+function mensagemVitoria(pontuacaoCalculada) {
+    contexto.save();
+    
     contexto.font = "bold 18px Consolas";
     contexto.textAlign = "center";
     contexto.textBaseline = "middle";
     contexto.fillStyle = "lightgray";
+    
     let mensagem = `VOCÊ ALUNISSOU COM SUCESSO!`;
-    let pontuacao = `PONTUAÇÃO: ${calcularPontuacao(moduloLunar)}`;
+    let pontuacao = `PONTUAÇÃO: ${pontuacaoCalculada.pontuacao}`;
+    let avisoRecorde = '-- NOVO RECORDE --';
+    
     contexto.fillText(mensagem, canvas.width / 2, canvas.height / 2);
     contexto.fillText(pontuacao, canvas.width / 2, (canvas.height / 2) + 20);
+    
+    if (pontuacaoCalculada.novoRecorde) {
+        configuracao.pontuacaoMaxima = pontuacaoCalculada.pontuacao;
+        contexto.fillText(avisoRecorde, canvas.width / 2, (canvas.height / 2) + 40);
+    }
+
     contexto.restore();
 }
 
@@ -327,6 +353,7 @@ function desenharTela() {
         mostrarCombustivel();
         mostrarAngulo();
         mostrarAltitude();
+        mostrarPontuacao();
 
         // chama a função desenhar a cada quadro
         requestAnimationFrame(desenharTela);
@@ -356,7 +383,7 @@ function teclaPressionada(evento) {
     }
 
     else if (evento.keyCode === 13) {
-        reiniciarJogo();
+        iniciarJogo();
     }
 
 }
