@@ -174,6 +174,9 @@ function detectarContato() {
             exibirMensagemVitoria(pontuacao);
 
         }
+
+        exibirReiniciarJogo();
+
         jogoAtivo = false;
         finalizarJogo();
 
@@ -231,7 +234,7 @@ function iniciarJogo() {
     moduloLunar.velocidade.y = 0;
     moduloLunar.combustivel = moduloLunar.combustivelInicial;
     moduloLunar.motorLigado = false;
-    moduloLunar.angulo = Math.PI * (inversao ? .5 : -.5);
+    moduloLunar.angulo = Math.PI * (inversao ? .25 : -.25);
     moduloLunar.rotacaoNegativa = false;
     moduloLunar.rotacaoPositiva = false;
 
@@ -253,13 +256,15 @@ function desenharChama() {
     contexto.fill();
 }
 
-function exibirIndicador(indicador, posicaoX, posicaoY, fontWeight = 'bold', fontSize = '18px', fontFamily = 'Consolas', textAlign = 'left', textBaseline = 'middle', color = 'lightgray') {
+function exibirIndicador(indicador, posicaoX, posicaoY, textAlign = 'left', color = 'lightgray', fontWeight = 'bold', fontSize = '18px', fontFamily = 'Consolas', textBaseline = 'middle') {
 
+    contexto.save()
     contexto.font = `${fontWeight} ${fontSize} ${fontFamily}`;
     contexto.textBaseline = textBaseline;
     contexto.textAlign = textAlign;
     contexto.fillStyle = color;
     contexto.fillText(indicador, posicaoX, posicaoY);
+    contexto.restore();
 
 }
 
@@ -294,58 +299,53 @@ function exibirAltitude() {
 
 function exibirPontuacao() {
 
-    contexto.save();
-
-    contexto.font = "bold 18px Consolas";
-    contexto.textBaseline = "middle";
-    contexto.fillStyle = "lightgray";
-    contexto.textAlign = "right";
-
     let pontuacaoMaxima = `Maior pontuação: ${configuracao.pontuacaoMaxima}`;
-    contexto.fillText(pontuacaoMaxima, 760, 40);
+    exibirIndicador(pontuacaoMaxima, 760, 40, textAlign = 'right');
 
-    contexto.restore();
 }
 
 function exibirMensagemVitoria(pontuacaoCalculada) {
-    contexto.save();
-
-    contexto.font = "bold 18px Consolas";
-    contexto.textAlign = "center";
-    contexto.textBaseline = "middle";
-    contexto.fillStyle = "cyan";
-
-    let mensagem = `VOCÊ ALUNISSOU COM SUCESSO!`;
+   
+    let mensagemVitoria = `VOCÊ ALUNISSOU COM SUCESSO!`;
     let pontuacao = `PONTUAÇÃO: ${pontuacaoCalculada.pontuacao}`;
     let avisoRecorde = '-- NOVO RECORDE --';
 
-    contexto.fillText(mensagem, canvas.width / 2, canvas.height / 2);
-    contexto.fillText(pontuacao, canvas.width / 2, (canvas.height / 2) + 20);
+    exibirIndicador(mensagemVitoria, canvas.width / 2, (canvas.height / 2) -20, 'center', 'cyan');
+    exibirIndicador(pontuacao, canvas.width / 2, (canvas.height / 2), 'center', 'cyan');
 
     if (pontuacaoCalculada.novoRecorde) {
+        
         configuracao.pontuacaoMaxima = pontuacaoCalculada.pontuacao;
-        contexto.fillText(avisoRecorde, canvas.width / 2, (canvas.height / 2) + 40);
+        exibirIndicador(avisoRecorde, canvas.width / 2, (canvas.height / 2) + 40, 'center', 'cyan');
     }
-
-    contexto.restore();
 }
 
 function exibirMensagemFracasso(dadosAlunissagem) {
 
-    contexto.save();
-    contexto.font = "bold 18px Consolas";
-    contexto.textAlign = "center";
-    contexto.textBaseline = "middle";
-    contexto.fillStyle = "crimson";
-    let mensagem = `VOCÊ VIROU POEIRA ESPACIAL 😵`;
+    const velocidadeFinalY = Math.abs(Math.round(10 * dadosAlunissagem.velocidadeFinal.y));
+    const velocidadeFinalX = Math.abs(Math.round(10 * dadosAlunissagem.velocidadeFinal.x));
+    const anguloFinal = Math.abs(Math.round(dadosAlunissagem.angulo * 180 / Math.PI) % 360);
 
-    let velocidadeFinal = `Velocidade Final: V: ${Math.abs(Math.round(10 * dadosAlunissagem.velocidadeFinal.y))} m/s | H: ${Math.abs(Math.round(10 * dadosAlunissagem.velocidadeFinal.x))} m/s`;
+    const msgFracasso = `VOCÊ VIROU POEIRA ESPACIAL 😵`;
+    const msgVelocidadeFinalY = `Velocidade vertical: ${velocidadeFinalY} m/s`;
+    const msgVelocidadeFinalX = `Velocidade horizontal: ${velocidadeFinalX} m/s`;
+    const msgAnguloFinal = `Angulo final: ${anguloFinal}°`;
+    
+    exibirIndicador(msgFracasso, canvas.width / 2, (canvas.height / 2) -40, 'center', 'crimson');
+    exibirIndicador(msgVelocidadeFinalY, canvas.width / 2, (canvas.height / 2), 'center', Math.abs(dadosAlunissagem.velocidadeFinal.y) > .5 ? 'crimson' : 'lightgray');
+    exibirIndicador(msgVelocidadeFinalX, canvas.width / 2, (canvas.height / 2) + 20, 'center', Math.abs(dadosAlunissagem.velocidadeFinal.x) > .5 ? 'crimson' : 'lightgray');
+    exibirIndicador(msgAnguloFinal, canvas.width / 2, (canvas.height / 2) + 40, 'center', Math.abs(dadosAlunissagem.angulo) > 3 ? 'crimson' : 'lightgray');
+}
 
-    let anguloFinal = `Angulo Final: ${Math.abs(Math.round(dadosAlunissagem.angulo * 180 / Math.PI) % 360)} °`;
-    contexto.fillText(mensagem, canvas.width / 2, canvas.height / 2);
-    contexto.fillText(velocidadeFinal, canvas.width / 2, (canvas.height / 2) + 20);
-    contexto.fillText(anguloFinal, canvas.width / 2, (canvas.height / 2) + 40);
-    contexto.restore();
+function exibirReiniciarJogo() {
+    
+    const mensagemReiniciar = 'Pressione ENTER para jogar';
+
+    exibirIndicador(
+        indicador = mensagemReiniciar, 
+        posicaoX = canvas.width / 2, 
+        posicaoY = (canvas.height / 2) + 80, 
+        textAlign = 'center')
 }
 
 function desenharTela() {
