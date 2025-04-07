@@ -270,7 +270,7 @@ function exibirIndicador(indicador, posicaoX, posicaoY, textAlign = 'left', colo
 
 function exibirVelocidade() {
 
-    const velocidade = `Velocidade: V: ${Math.abs(Math.round(10 * moduloLunar.velocidade.y))} m/s | H: ${Math.abs(Math.round(10 * moduloLunar.velocidade.x))} m/s`;
+    const velocidade = `Velocidade: V: ${Math.abs(Math.round(10 * moduloLunar.velocidade.y))} m/s   H: ${Math.abs(Math.round(10 * moduloLunar.velocidade.x))} m/s`;
 
     exibirIndicador(velocidade, 40, 40);
 }
@@ -300,7 +300,7 @@ function exibirAltitude() {
 function exibirPontuacao() {
 
     let pontuacaoMaxima = `RECORDE: ${configuracao.pontuacaoMaxima}`;
-    exibirIndicador(pontuacaoMaxima, 760, 40, textAlign = 'right');
+    exibirIndicador(pontuacaoMaxima, 760, 40, 'right', 'cyan');
 
 }
 
