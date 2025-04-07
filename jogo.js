@@ -277,7 +277,7 @@ function exibirVelocidade() {
 
 function exibirCombustivel() {
 
-    const combustivel = `Combustível: ${Math.round(moduloLunar.combustivel / moduloLunar.combustivelInicial * 100)} %`;
+    const combustivel = `Combustível: ${Math.round(moduloLunar.combustivel / moduloLunar.combustivelInicial * 100)}%`;
 
     exibirIndicador(combustivel, 40, 60);
 
@@ -285,7 +285,7 @@ function exibirCombustivel() {
 
 function exibirAngulo() {
 
-    let angulo = `Ângulo: ${Math.abs(Math.round(moduloLunar.angulo * 180 / Math.PI) % 360)} °`;
+    let angulo = `Ângulo: ${Math.abs(Math.round(moduloLunar.angulo * 180 / Math.PI) % 360)}°`;
 
     exibirIndicador(angulo, 40, 80);
 }
@@ -299,53 +299,51 @@ function exibirAltitude() {
 
 function exibirPontuacao() {
 
-    let pontuacaoMaxima = `Maior pontuação: ${configuracao.pontuacaoMaxima}`;
+    let pontuacaoMaxima = `RECORDE: ${configuracao.pontuacaoMaxima}`;
     exibirIndicador(pontuacaoMaxima, 760, 40, textAlign = 'right');
 
 }
 
 function exibirMensagemVitoria(pontuacaoCalculada) {
-   
+
     let mensagemVitoria = `VOCÊ ALUNISSOU COM SUCESSO!`;
     let pontuacao = `PONTUAÇÃO: ${pontuacaoCalculada.pontuacao}`;
     let avisoRecorde = '-- NOVO RECORDE --';
 
-    exibirIndicador(mensagemVitoria, canvas.width / 2, (canvas.height / 2) -20, 'center', 'cyan');
-    exibirIndicador(pontuacao, canvas.width / 2, (canvas.height / 2), 'center', 'cyan');
+    exibirIndicador(mensagemVitoria, canvas.width / 2, (canvas.height / 2), 'center', 'cyan');
+    exibirIndicador(pontuacao, canvas.width / 2, (canvas.height / 2) + 20, 'center', 'cyan');
 
     if (pontuacaoCalculada.novoRecorde) {
-        
+
         configuracao.pontuacaoMaxima = pontuacaoCalculada.pontuacao;
-        exibirIndicador(avisoRecorde, canvas.width / 2, (canvas.height / 2) + 40, 'center', 'cyan');
+        exibirIndicador(avisoRecorde, canvas.width / 2, (canvas.height / 2) - 40, 'center', 'cyan', 'bold', '20px');
     }
 }
 
 function exibirMensagemFracasso(dadosAlunissagem) {
 
-    const velocidadeFinalY = Math.abs(Math.round(10 * dadosAlunissagem.velocidadeFinal.y));
-    const velocidadeFinalX = Math.abs(Math.round(10 * dadosAlunissagem.velocidadeFinal.x));
-    const anguloFinal = Math.abs(Math.round(dadosAlunissagem.angulo * 180 / Math.PI) % 360);
+    const velocidadeFinalY = Math.abs(Number(10 * dadosAlunissagem.velocidadeFinal.y).toFixed(2));
+    const velocidadeFinalX = Math.abs(Number(10 * dadosAlunissagem.velocidadeFinal.x).toFixed(2));
+    const anguloFinal = Math.abs(Number(dadosAlunissagem.angulo * 180 / Math.PI).toFixed(1) % 360);
 
     const msgFracasso = `VOCÊ VIROU POEIRA ESPACIAL 😵`;
     const msgVelocidadeFinalY = `Velocidade vertical: ${velocidadeFinalY} m/s`;
     const msgVelocidadeFinalX = `Velocidade horizontal: ${velocidadeFinalX} m/s`;
     const msgAnguloFinal = `Angulo final: ${anguloFinal}°`;
+
+    exibirIndicador(msgFracasso, canvas.width / 2, (canvas.height / 2) - 40, 'center', 'crimson', 'bold', '20px');
     
-    exibirIndicador(msgFracasso, canvas.width / 2, (canvas.height / 2) -40, 'center', 'crimson');
-    exibirIndicador(msgVelocidadeFinalY, canvas.width / 2, (canvas.height / 2), 'center', Math.abs(dadosAlunissagem.velocidadeFinal.y) > .5 ? 'crimson' : 'lightgray');
-    exibirIndicador(msgVelocidadeFinalX, canvas.width / 2, (canvas.height / 2) + 20, 'center', Math.abs(dadosAlunissagem.velocidadeFinal.x) > .5 ? 'crimson' : 'lightgray');
-    exibirIndicador(msgAnguloFinal, canvas.width / 2, (canvas.height / 2) + 40, 'center', Math.abs(dadosAlunissagem.angulo) > 3 ? 'crimson' : 'lightgray');
+    exibirIndicador(msgVelocidadeFinalY, canvas.width / 2, (canvas.height / 2), 'center', velocidadeFinalY > 5.0 ? 'crimson' : 'lightgray');
+    
+    exibirIndicador(msgVelocidadeFinalX, canvas.width / 2, (canvas.height / 2) + 20, 'center', velocidadeFinalX > 5.0 ? 'crimson' : 'lightgray');
+    
+    exibirIndicador(msgAnguloFinal, canvas.width / 2, (canvas.height / 2) + 40, 'center', anguloFinal > 3 ? 'crimson' : 'lightgray');
 }
 
 function exibirReiniciarJogo() {
-    
-    const mensagemReiniciar = 'Pressione ENTER para jogar';
 
-    exibirIndicador(
-        indicador = mensagemReiniciar, 
-        posicaoX = canvas.width / 2, 
-        posicaoY = (canvas.height / 2) + 80, 
-        textAlign = 'center')
+    const msgReiniciar = 'Pressione ENTER para jogar';
+    exibirIndicador(msgReiniciar, canvas.width / 2, (canvas.height / 2) + 80, 'center');
 }
 
 function desenharTela() {
