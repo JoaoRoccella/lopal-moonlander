@@ -74,7 +74,7 @@ process.on('SIGINT', () => {
 }); */
 
 // ======== Iniciar servidor ========
-const PORT = 8080;
+const PORT = 8050;
 server.listen(PORT, () => {
     console.log(`Servidor HTTP rodando em http://localhost:${PORT}`);
 });
