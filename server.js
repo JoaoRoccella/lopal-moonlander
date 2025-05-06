@@ -4,14 +4,18 @@ const path = require('path');
 const { Gpio } = require('onoff');
 const WebSocket = require('ws');
 
-// ======== Servidor HTTP para servir arquivos estáticos ========
+// ======== Servidor HTTP para arquivos estáticos ========
 const server = http.createServer((req, res) => {
     let filePath = './public' + (req.url === '/' ? '/index.html' : req.url);
     const extname = String(path.extname(filePath)).toLowerCase();
     const mimeTypes = {
         '.html': 'text/html',
         '.js': 'application/javascript',
-        '.css': 'text/css'
+        '.css': 'text/css',
+        '.json': 'application/json',
+        '.png': 'image/png',
+        '.jpg': 'image/jpg',
+        '.wav': 'audio/wav',
     };
 
     const contentType = mimeTypes[extname] || 'application/octet-stream';
@@ -27,49 +31,50 @@ const server = http.createServer((req, res) => {
     });
 });
 
-// ======== Servidor WebSocket ========
+// ======== Servidor WebSocket embutido ========
 const wss = new WebSocket.Server({ server });
-let socket = null;
 
+let socket = null;
 wss.on('connection', ws => {
     console.log('Cliente WebSocket conectado');
     socket = ws;
 });
 
-// ======== GPIO com pigpio (modo entrada com polling) ========
-const botaoDireita = new Gpio(5, { mode: Gpio.INPUT, pullUpDown: Gpio.PUD_UP, alert: true });
-const botaoEsquerda = new Gpio(6, { mode: Gpio.INPUT, pullUpDown: Gpio.PUD_UP, alert: true });
-const botaoThrust = new Gpio(13, { mode: Gpio.INPUT, pullUpDown: Gpio.PUD_UP, alert: true });
+// ======== GPIO: Botões físicos ========
+const btnDir = new Gpio(5, 'in', 'rising', { debounceTimeout: 10 });
+const btnEsq = new Gpio(6, 'in', 'rising', { debounceTimeout: 10 });
+const btnThrust = new Gpio(13, 'in', 'rising', { debounceTimeout: 10 });
 
-function enviarComando(acao) {
+function enviarComando(comando) {
     if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({ acao }));
+        socket.send(JSON.stringify({ acao: comando }));
     }
 }
 
-// Configura evento para detecção de borda de descida (botão pressionado)
-function configurarBotao(botao, acao) {
-    botao.glitchFilter(10000); // debounce de 10ms
-    botao.on('alert', (level, tick) => {
-        if (level === 0) {
-            enviarComando(acao);
-        }
-    });
-}
+btnDir.watch((err, value) => {
+    if (err) throw err;
+    enviarComando('giro_direita');
+});
 
-configurarBotao(botaoDireita, 'giro_direita');
-configurarBotao(botaoEsquerda, 'giro_esquerda');
-configurarBotao(botaoThrust, 'propulsor');
+btnEsq.watch((err, value) => {
+    if (err) throw err;
+    enviarComando('giro_esquerda');
+});
+
+btnThrust.watch((err, value) => {
+    if (err) throw err;
+    enviarComando('propulsor');
+});
 
 process.on('SIGINT', () => {
-    botaoDireita.disableAlert();
-    botaoEsquerda.disableAlert();
-    botaoThrust.disableAlert();
+    btnDir.unexport();
+    btnEsq.unexport();
+    btnThrust.unexport();
     process.exit();
 });
 
 // ======== Iniciar servidor ========
 const PORT = 8080;
 server.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
+    console.log(`Servidor HTTP rodando em http://localhost:${PORT}`);
 });
