@@ -41,7 +41,7 @@ wss.on('connection', ws => {
 });
 
 // ======== GPIO: Botões físicos ========
-const btnDir = new Gpio(5, 'in', 'rising', { debounceTimeout: 10 });
+/* const btnDir = new Gpio(5, 'in', 'rising', { debounceTimeout: 10 });
 const btnEsq = new Gpio(6, 'in', 'rising', { debounceTimeout: 10 });
 const btnThrust = new Gpio(13, 'in', 'rising', { debounceTimeout: 10 });
 
@@ -71,7 +71,7 @@ process.on('SIGINT', () => {
     btnEsq.unexport();
     btnThrust.unexport();
     process.exit();
-});
+}); */
 
 // ======== Iniciar servidor ========
 const PORT = 8080;
