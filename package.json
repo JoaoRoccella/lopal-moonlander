@@ -1,0 +1,24 @@
+{
+  "name": "jogo-moonlander",
+  "version": "1.0.0",
+  "description": "Desenvolvimento do joguinho de alunissagem para treino das habilidades em JavaScript.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoaoRoccella/lopal-moonlander.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JoaoRoccella/lopal-moonlander/issues"
+  },
+  "homepage": "https://github.com/JoaoRoccella/lopal-moonlander#readme",
+  "dependencies": {
+    "ws": "^8.18.2",
+    "onoff": "^6.0.3"
+  }
+}
