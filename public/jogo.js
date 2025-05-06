@@ -364,6 +364,8 @@ function atracaoGravitacional() {
 
 }
 
+iniciarJogo();
+
 
 /*  Seção de controle */
 
