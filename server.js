@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { Gpio } = require('onoff');
+const { Gpio } = require('onoff').Gpio;
 const WebSocket = require('ws');
 
 // ======== Servidor HTTP para arquivos estáticos ========
@@ -32,7 +32,7 @@ const server = http.createServer((req, res) => {
 });
 
 // ======== Servidor WebSocket embutido ========
-const wss = new WebSocket.Server({ server });
+/* const wss = new WebSocket.Server({ server });
 
 let socket = null;
 wss.on('connection', ws => {
@@ -71,7 +71,7 @@ process.on('SIGINT', () => {
     btnEsq.unexport();
     btnThrust.unexport();
     process.exit();
-});
+}); */
 
 // ======== Iniciar servidor ========
 const PORT = 8080;
