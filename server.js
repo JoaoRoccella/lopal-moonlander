@@ -1,21 +1,17 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { Gpio } = require('onoff');
+const { Gpio } = require('pigpio');
 const WebSocket = require('ws');
 
-// ======== Servidor HTTP para arquivos estáticos ========
+// ======== Servidor HTTP para servir arquivos estáticos ========
 const server = http.createServer((req, res) => {
     let filePath = './public' + (req.url === '/' ? '/index.html' : req.url);
     const extname = String(path.extname(filePath)).toLowerCase();
     const mimeTypes = {
         '.html': 'text/html',
         '.js': 'application/javascript',
-        '.css': 'text/css',
-        '.json': 'application/json',
-        '.png': 'image/png',
-        '.jpg': 'image/jpg',
-        '.wav': 'audio/wav',
+        '.css': 'text/css'
     };
 
     const contentType = mimeTypes[extname] || 'application/octet-stream';
@@ -31,50 +27,49 @@ const server = http.createServer((req, res) => {
     });
 });
 
-// ======== Servidor WebSocket embutido ========
+// ======== Servidor WebSocket ========
 const wss = new WebSocket.Server({ server });
-
 let socket = null;
+
 wss.on('connection', ws => {
     console.log('Cliente WebSocket conectado');
     socket = ws;
 });
 
-// ======== GPIO: Botões físicos ========
-const btnDir = new Gpio(5, 'in', 'rising', { debounceTimeout: 10 });
-const btnEsq = new Gpio(6, 'in', 'rising', { debounceTimeout: 10 });
-const btnThrust = new Gpio(13, 'in', 'rising', { debounceTimeout: 10 });
+// ======== GPIO com pigpio (modo entrada com polling) ========
+const botaoDireita = new Gpio(5, { mode: Gpio.INPUT, pullUpDown: Gpio.PUD_UP, alert: true });
+const botaoEsquerda = new Gpio(6, { mode: Gpio.INPUT, pullUpDown: Gpio.PUD_UP, alert: true });
+const botaoThrust = new Gpio(13, { mode: Gpio.INPUT, pullUpDown: Gpio.PUD_UP, alert: true });
 
-function enviarComando(comando) {
+function enviarComando(acao) {
     if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({ acao: comando }));
+        socket.send(JSON.stringify({ acao }));
     }
 }
 
-btnDir.watch((err, value) => {
-    if (err) throw err;
-    enviarComando('giro_direita');
-});
+// Configura evento para detecção de borda de descida (botão pressionado)
+function configurarBotao(botao, acao) {
+    botao.glitchFilter(10000); // debounce de 10ms
+    botao.on('alert', (level, tick) => {
+        if (level === 0) {
+            enviarComando(acao);
+        }
+    });
+}
 
-btnEsq.watch((err, value) => {
-    if (err) throw err;
-    enviarComando('giro_esquerda');
-});
-
-btnThrust.watch((err, value) => {
-    if (err) throw err;
-    enviarComando('propulsor');
-});
+configurarBotao(botaoDireita, 'giro_direita');
+configurarBotao(botaoEsquerda, 'giro_esquerda');
+configurarBotao(botaoThrust, 'propulsor');
 
 process.on('SIGINT', () => {
-    btnDir.unexport();
-    btnEsq.unexport();
-    btnThrust.unexport();
+    botaoDireita.disableAlert();
+    botaoEsquerda.disableAlert();
+    botaoThrust.disableAlert();
     process.exit();
 });
 
 // ======== Iniciar servidor ========
 const PORT = 8080;
 server.listen(PORT, () => {
-    console.log(`Servidor HTTP rodando em http://localhost:${PORT}`);
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
