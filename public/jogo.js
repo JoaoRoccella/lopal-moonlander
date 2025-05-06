@@ -335,7 +335,7 @@ function desenharTela() {
 
     if (!jogoAtivo) return;
 
-        contexto.clearRect(0, 0, canvas.width, canvas.height);
+        // contexto.clearRect(0, 0, canvas.width, canvas.height);
 
         desenharEstrelas(estrelas);
         detectarContato();
@@ -347,9 +347,7 @@ function desenharTela() {
         exibirAltitude();
         exibirPontuacao();
 
-        // chama a função desenhar a cada quadro
         requestAnimationFrame(desenharTela);
-
 }
 
 function atracaoGravitacional() {
