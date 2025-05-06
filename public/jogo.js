@@ -21,9 +21,9 @@ let estrelas = criarEstrelas();
 
 let configuracao = {
     aceleracaoGravidadeLunar: 0.016,
-    teclaAceleracao: 38,
-    teclaRotacaoNegativa: 37,
-    teclaRotacaoPositiva: 39,
+    teclaAceleracao: 'ArrowUp',
+    teclaRotacaoNegativa: 'ArrowLeft',
+    teclaRotacaoPositiva: 'ArrowRight',
     pontuacaoMaxima: 0,
 }
 
@@ -76,33 +76,18 @@ function desenharEstrelas(estrelas) {
     contexto.fillStyle = '#000';
     contexto.fillRect(0, 0, canvas.width, canvas.height);
 
-    for (let i = 0; i < estrelas.length; i++) {
-        let estrela = estrelas[i];
+    estrelas.forEach(estrela => {
         contexto.beginPath();
         contexto.arc(estrela.x, estrela.y, estrela.raio, 0, 2 * Math.PI);
         contexto.closePath();
         contexto.fillStyle = `rgba(0, 255, 255, ${estrela.brilho})`;
         contexto.fill();
 
-        if (estrela.apagando) {
-
-            estrela.brilho -= estrela.razaoDeCintilacao;
-
-            if (estrela.brilho < .3) {
-
-                estrela.apagando = false;
-            }
-        } else {
-
-            estrela.brilho += estrela.razaoDeCintilacao;
-
-            if (estrela.brilho > .95) {
-
-                estrela.apagando = true;
-            }
+        estrela.brilho += estrela.apagando ? -estrela.razaoDeCintilacao : estrela.razaoDeCintilacao;
+        if (estrela.brilho < 0.3 || estrela.brilho > 0.95) {
+            estrela.apagando = !estrela.apagando;
         }
-
-    }
+    });
     contexto.restore();
 }
 
@@ -348,8 +333,8 @@ function exibirReiniciarJogo() {
 
 function desenharTela() {
 
-    if (jogoAtivo) {
-        // limpar a tela
+    if (!jogoAtivo) return;
+
         contexto.clearRect(0, 0, canvas.width, canvas.height);
 
         desenharEstrelas(estrelas);
@@ -364,55 +349,6 @@ function desenharTela() {
 
         // chama a função desenhar a cada quadro
         requestAnimationFrame(desenharTela);
-    }
-
-}
-
-/*  Seção de controle */
-
-document.addEventListener('keydown', teclaPressionada);
-
-function teclaPressionada(evento) {
-
-    // Pressionando a tecla "seta para cima" para ligar o motor
-    if (evento.keyCode === configuracao.teclaAceleracao && moduloLunar.combustivel > 0) {
-        moduloLunar.motorLigado = true;
-    }
-
-    // Pressionando a tecla "seta à esquerda" para rotacionar negativamente
-    else if (evento.keyCode === configuracao.teclaRotacaoNegativa) {
-        moduloLunar.rotacaoNegativa = true;
-    }
-
-    // Pressionando a tecla "seta à direita" para rotacionar positivamente
-    else if (evento.keyCode === configuracao.teclaRotacaoPositiva) {
-        moduloLunar.rotacaoPositiva = true;
-    }
-
-    else if (evento.keyCode === 13) {
-        iniciarJogo();
-    }
-
-}
-
-document.addEventListener('keyup', teclaSolta);
-
-function teclaSolta(evento) {
-
-    // Soltando a tecla "seta para cima" para desligar o motor
-    if (evento.keyCode === configuracao.teclaAceleracao) {
-        moduloLunar.motorLigado = false;
-    }
-
-    // Soltando a tecla "seta à esquerda"
-    else if (evento.keyCode === configuracao.teclaRotacaoNegativa) {
-        moduloLunar.rotacaoNegativa = false;
-    }
-
-    // Soltando a tecla "seta à direita"
-    else if (evento.keyCode === configuracao.teclaRotacaoPositiva) {
-        moduloLunar.rotacaoPositiva = false;
-    }
 
 }
 
@@ -430,4 +366,36 @@ function atracaoGravitacional() {
 
 }
 
-desenharTela();
+
+/*  Seção de controle */
+
+document.addEventListener('keydown', (e) => {
+    switch (e.key) {
+        case configuracao.teclaAceleracao:
+            moduloLunar.motorLigado = true;
+            break;
+        case configuracao.teclaRotacaoNegativa:
+            moduloLunar.rotacaoNegativa = true;
+            break;
+        case configuracao.teclaRotacaoPositiva:
+            moduloLunar.rotacaoPositiva = true;
+            break;
+        case 'Enter':
+            iniciarJogo();
+            break;
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    switch (e.key) {
+        case configuracao.teclaAceleracao:
+            moduloLunar.motorLigado = false;
+            break;
+        case configuracao.teclaRotacaoNegativa:
+            moduloLunar.rotacaoNegativa = false;
+            break;
+        case configuracao.teclaRotacaoPositiva:
+            moduloLunar.rotacaoPositiva = false;
+            break;
+    }
+});
