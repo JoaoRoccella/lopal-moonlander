@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/JoaoRoccella/lopal-moonlander#readme",
   "dependencies": {
-    "pigpio": "^3.3.1",
+    "onoff": "^6.0.3",
     "ws": "^8.18.2"
   }
 }

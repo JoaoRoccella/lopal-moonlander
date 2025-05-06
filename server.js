@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { Gpio } = require('pigpio');
+const { Gpio } = require('onoff');
 const WebSocket = require('ws');
 
 // ======== Servidor HTTP para servir arquivos estáticos ========
