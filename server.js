@@ -4,7 +4,9 @@ const path = require('path');
 const { Gpio } = require('onoff');
 const WebSocket = require('ws');
 
-// ======== Servidor HTTP para arquivos estáticos ========
+
+// === Servidor Web ===
+
 const server = http.createServer((req, res) => {
     let filePath = './public' + (req.url === '/' ? '/index.html' : req.url);
     const extname = String(path.extname(filePath)).toLowerCase();
@@ -31,7 +33,9 @@ const server = http.createServer((req, res) => {
     });
 });
 
-// ======== Servidor WebSocket embutido ========
+
+// === Servidor WebSocket ===
+
 const wss = new WebSocket.Server({ server });
 
 let socket = null;
@@ -40,7 +44,9 @@ wss.on('connection', ws => {
     socket = ws;
 });
 
-// ======== GPIO: Botões físicos ========
+
+// === GPIO: Botões físicos ===
+
 /* const btnDir = new Gpio(5, 'in', 'rising', { debounceTimeout: 10 });
 const btnEsq = new Gpio(6, 'in', 'rising', { debounceTimeout: 10 });
 const btnThrust = new Gpio(13, 'in', 'rising', { debounceTimeout: 10 });
@@ -73,7 +79,9 @@ process.on('SIGINT', () => {
     process.exit();
 }); */
 
-// ======== Iniciar servidor ========
+
+// === Iniciar servidor ===
+
 const PORT = 8050;
 server.listen(PORT, () => {
     console.log(`Servidor HTTP rodando em http://localhost:${PORT}`);
