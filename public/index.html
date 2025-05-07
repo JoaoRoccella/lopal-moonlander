@@ -5,18 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alunissagem</title>
     <style>
+        
         * {
             margin: 0;
         }
+        
         img, canvas {
             display: block;
             width: 800px;
         }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+        }
+
+        #cenario {
+            z-index: 0;
+        }
+
+        #jogo {
+            z-index: 1;
+            /* display: none; */
+        }
+
+        img {
+            position: absolute;
+            top: 600px;
+            z-index: 2;
+        }
     </style>
 </head>
 <body>
+    <canvas id="cenario" width="800" height="600"></canvas>
     <canvas id="jogo" width="800" height="600"></canvas>
-    <img src="superficieLua.png" alt="">
-    <script src="jogo.js"></script>
+    <img src="img/superficieLua.png" alt="Superfície da lua">
+    
+    <script src="js/jogo_otimizado.js"></script>
 </body>
 </html>

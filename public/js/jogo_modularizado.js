@@ -7,17 +7,183 @@
     Lander: https://www.flaticon.com/br/icones-gratis/lander
 */
 
+/* class Estrela {
+    constructor(largura, altura) {
+        this.x = Math.random() * largura;
+        this.y = Math.random() * altura;
+        this.raio = Math.sqrt(Math.random() * 2);
+        this.brilho = Math.random();
+        this.apagando = true;
+        this.razaoDeCintilacao = Math.random() * 0.015;
+    }
+
+    atualizar() {
+        this.brilho += this.apagando ? -this.razaoDeCintilacao : this.razaoDeCintilacao;
+        if (this.brilho < 0.3 || this.brilho > 0.95) {
+            this.apagando = !this.apagando;
+        }
+    }
+
+    desenhar(ctx) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.raio, 0, 2 * Math.PI);
+        ctx.fillStyle = `rgba(0, 255, 255, ${this.brilho})`;
+        ctx.fill();
+    }
+}
+
+
+class ModuloLunar {
+
+    constructor(inversao) {
+        this.largura = 30;
+        this.altura = 30;
+        this.aceleracao = 0.02;
+        this.razaoRotacao = 2;
+        this.razaoConsumoCombustivel = 1;
+        this.tamanhoChama = 20;
+        this.combustivelInicial = 1000;
+
+        this.resetar(inversao);
+    }
+
+    resetar(inversao) {
+        this.posicao = {
+            x: inversao ? 700 : 100,
+            y: 100
+        };
+        this.velocidade = {
+            x: inversao ? -3 : 3,
+            y: 0
+        };
+        this.angulo = Math.PI * (inversao ? 0.25 : -0.25);
+        this.combustivel = this.combustivelInicial;
+        this.motorLigado = false;
+        this.rotacaoNegativa = false;
+        this.rotacaoPositiva = false;
+    }
+
+    atualizar() {
+        if (this.motorLigado && this.combustivel > 0) {
+            this.combustivel -= this.razaoConsumoCombustivel;
+            this.velocidade.y -= this.aceleracao * Math.cos(this.angulo);
+            this.velocidade.x += this.aceleracao * Math.sin(this.angulo);
+        } else {
+            this.motorLigado = false;
+        }
+
+        if (this.rotacaoNegativa) {
+            this.angulo -= (Math.PI / 180) / this.razaoRotacao;
+        } else if (this.rotacaoPositiva) {
+            this.angulo += (Math.PI / 180) / this.razaoRotacao;
+        }
+
+        this.posicao.x += this.velocidade.x;
+        this.posicao.y += this.velocidade.y;
+    }
+
+    desenhar(ctx, imagem) {
+        ctx.save();
+        ctx.translate(this.posicao.x, this.posicao.y);
+        ctx.rotate(this.angulo);
+        ctx.drawImage(imagem, -this.largura / 2, -this.altura / 2, this.largura, this.altura);
+        ctx.restore();
+    }
+
+    desenharChama(ctx) {
+        ctx.beginPath();
+        ctx.moveTo((this.largura * -0.5) + 10, (this.altura * 0.5) - 5);
+        ctx.lineTo((this.largura * 0.5) - 10, (this.altura * 0.5) - 5);
+        ctx.lineTo(0, this.altura * 0.5 + Math.random() * this.tamanhoChama);
+        ctx.closePath();
+        ctx.fillStyle = 'orange';
+        ctx.fill();
+    }
+} */
+
 /** @type {HTMLCanvasElement} */
 
-/*  Seção de modelagem de dados */
+/**** CENÁRIO ****/
 
-let canvas = document.querySelector('#jogo');
-let contexto = canvas.getContext('2d');
+const canvasCenario = document.querySelector('#cenario');
+const contextoCenario = canvasCenario.getContext('2d');
+
+const LARGURA = canvasCenario.width;
+const ALTURA = canvasCenario.height;
+
+// Quantidade de estrelas baseada na densidade da tela
+const DENSIDADE_ESTRELAS = 0.0005; // estrelas por pixel
+const QUANTIDADE_ESTRELAS = Math.floor(LARGURA * ALTURA * DENSIDADE_ESTRELAS);
+
+function criarEstrelas() {
+    const estrelas = [];
+    for (let i = 0; i < QUANTIDADE_ESTRELAS; i++) {
+        estrelas.push({
+            x: Math.random() * LARGURA,
+            y: Math.random() * ALTURA,
+            raio: Math.sqrt(Math.random() * 2),
+            brilho: Math.random(),
+            apagando: true,
+            razaoDeCintilacao: Math.random() * 0.015
+        });
+    }
+    return estrelas;
+}
+
+let estrelas = criarEstrelas();
+
+// Canvas offscreen para renderizar fundo
+const offscreen = document.createElement('canvas');
+offscreen.width = LARGURA;
+offscreen.height = ALTURA;
+const ctxOff = offscreen.getContext('2d');
+
+function atualizarCintilacao(estrelas) {
+    estrelas.forEach(estrela => {
+        estrela.brilho += estrela.apagando ? -estrela.razaoDeCintilacao : estrela.razaoDeCintilacao;
+        if (estrela.brilho < 0.3 || estrela.brilho > 0.95) {
+            estrela.apagando = !estrela.apagando;
+        }
+    });
+}
+
+function desenharFundoEstrelado(estrelas) {
+    ctxOff.fillStyle = '#000';
+    ctxOff.fillRect(0, 0, LARGURA, ALTURA);
+
+    estrelas.forEach(estrela => {
+        ctxOff.beginPath();
+        ctxOff.arc(estrela.x, estrela.y, estrela.raio, 0, 2 * Math.PI);
+        ctxOff.fillStyle = `rgba(0, 255, 255, ${estrela.brilho})`;
+        ctxOff.fill();
+    });
+}
+
+let frameAtual = 0;
+const INTERVALO_REDESENHO_FUNDO = 3;
+
+function desenharCenario() {
+    if (frameAtual % INTERVALO_REDESENHO_FUNDO === 0) {
+        atualizarCintilacao(estrelas);
+        desenharFundoEstrelado(estrelas);
+    }
+    contextoCenario.drawImage(offscreen, 0, 0);
+    frameAtual++;
+    return;
+
+    atualizarCintilacao(estrelas);
+    desenharFundoEstrelado(estrelas);
+    contextoCenario.drawImage(offscreen, 0, 0);
+}
+
+/**** JOGO ****/
+
+let canvasJogo = document.querySelector('#jogo');
+let ctxJogo = canvasJogo.getContext('2d');
 
 let inversao = Boolean(Date.now() % 2);
 let colisao = false;
 let jogoAtivo = true;
-let estrelas = criarEstrelas();
 
 let configuracao = {
     aceleracaoGravidadeLunar: 0.016,
@@ -26,6 +192,9 @@ let configuracao = {
     teclaRotacaoPositiva: 'ArrowRight',
     pontuacaoMaxima: 0,
 }
+
+const imagemLander = new Image();
+imagemLander.src = 'img/lander.png';
 
 let moduloLunar = {
     posicao: {
@@ -47,67 +216,25 @@ let moduloLunar = {
     tamanhoChama: 20,
     combustivelInicial: 1000,
     combustivel: 1000,
-    razaoConsumoCombustivel: 1,
+    razaoConsumoCombustivel: 0.5,
     razaoRotacao: 2,
-};
-
-function criarEstrelas() {
-
-    let estrelas = [];
-
-    for (let i = 0; i < 500; i++) {
-        estrelas[i] = {
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            raio: Math.sqrt(Math.random() * 2),
-            brilho: Math.random(),
-            apagando: true,
-            razaoDeCintilacao: Math.random() * .01
-        };
-    }
-
-    return estrelas;
-
 }
 
-function desenharEstrelas(estrelas) {
-    contexto.save();
-
-    contexto.fillStyle = '#000';
-    contexto.fillRect(0, 0, canvas.width, canvas.height);
-
-    estrelas.forEach(estrela => {
-        contexto.beginPath();
-        contexto.arc(estrela.x, estrela.y, estrela.raio, 0, 2 * Math.PI);
-        contexto.closePath();
-        contexto.fillStyle = `rgba(0, 255, 255, ${estrela.brilho})`;
-        contexto.fill();
-
-        estrela.brilho += estrela.apagando ? -estrela.razaoDeCintilacao : estrela.razaoDeCintilacao;
-        if (estrela.brilho < 0.3 || estrela.brilho > 0.95) {
-            estrela.apagando = !estrela.apagando;
-        }
-    });
-    contexto.restore();
-}
-
-const imagemLander = new Image();
-imagemLander.src = 'lander.png';
 
 function desenharModuloLunar() {
 
-    contexto.save();
-    contexto.beginPath();
-    contexto.translate(moduloLunar.posicao.x, moduloLunar.posicao.y);
-    contexto.rotate(moduloLunar.angulo);
+    ctxJogo.save();
+    ctxJogo.beginPath();
+    ctxJogo.translate(moduloLunar.posicao.x, moduloLunar.posicao.y);
+    ctxJogo.rotate(moduloLunar.angulo);
 
-    contexto.drawImage(imagemLander, -moduloLunar.largura / 2, -moduloLunar.altura / 2, moduloLunar.largura, moduloLunar.altura);
-    contexto.closePath();
+    ctxJogo.drawImage(imagemLander, -moduloLunar.largura / 2, -moduloLunar.altura / 2, moduloLunar.largura, moduloLunar.altura);
+    ctxJogo.closePath();
 
     detectarQueimaMotor();
     detectarRotacao();
 
-    contexto.restore();
+    ctxJogo.restore();
 }
 
 function detectarQueimaMotor() {
@@ -128,6 +255,7 @@ function detectarQueimaMotor() {
 }
 
 function detectarRotacao() {
+    const passoRotacao = (Math.PI / 180) / moduloLunar.razaoRotacao;
 
     if (moduloLunar.rotacaoNegativa) {
         moduloLunar.angulo -= (Math.PI / 180) / moduloLunar.razaoRotacao;
@@ -140,7 +268,7 @@ function detectarRotacao() {
 
 function detectarContato() {
 
-    if (moduloLunar.posicao.y > (canvas.height - moduloLunar.altura * .5)) {
+    if (moduloLunar.posicao.y > (canvasJogo.height - moduloLunar.altura * .5)) {
 
         let dadosAlunissagem;
 
@@ -226,30 +354,30 @@ function iniciarJogo() {
     colisao = false;
     jogoAtivo = true;
     estrelas = criarEstrelas();
-    desenharTela();
+    loopPrincipal();
 
 }
 
 function desenharChama() {
 
-    contexto.beginPath();
-    contexto.moveTo((moduloLunar.largura * -.5) + 10, (moduloLunar.altura * .5) - 5);
-    contexto.lineTo((moduloLunar.largura * .5) - 10, (moduloLunar.altura * .5) - 5);
-    contexto.lineTo(0, moduloLunar.altura * .5 + Math.random() * moduloLunar.tamanhoChama);
-    contexto.closePath();
-    contexto.fillStyle = 'orange';
-    contexto.fill();
+    ctxJogo.beginPath();
+    ctxJogo.moveTo((moduloLunar.largura * -.5) + 10, (moduloLunar.altura * .5) - 5);
+    ctxJogo.lineTo((moduloLunar.largura * .5) - 10, (moduloLunar.altura * .5) - 5);
+    ctxJogo.lineTo(0, moduloLunar.altura * .5 + Math.random() * moduloLunar.tamanhoChama);
+    ctxJogo.closePath();
+    ctxJogo.fillStyle = 'orange';
+    ctxJogo.fill();
 }
 
 function exibirIndicador(indicador, posicaoX, posicaoY, textAlign = 'left', color = 'lightgray', fontWeight = 'bold', fontSize = '18px', fontFamily = 'Consolas', textBaseline = 'middle') {
 
-    contexto.save()
-    contexto.font = `${fontWeight} ${fontSize} ${fontFamily}`;
-    contexto.textBaseline = textBaseline;
-    contexto.textAlign = textAlign;
-    contexto.fillStyle = color;
-    contexto.fillText(indicador, posicaoX, posicaoY);
-    contexto.restore();
+    // contexto.save()
+    ctxJogo.font = `${fontWeight} ${fontSize} ${fontFamily}`;
+    ctxJogo.textBaseline = textBaseline;
+    ctxJogo.textAlign = textAlign;
+    ctxJogo.fillStyle = color;
+    ctxJogo.fillText(indicador, posicaoX, posicaoY);
+    // contexto.restore();
 
 }
 
@@ -277,7 +405,7 @@ function exibirAngulo() {
 
 function exibirAltitude() {
 
-    let angulo = `Altitude: ${Math.abs(Math.round(canvas.height - moduloLunar.posicao.y - (moduloLunar.altura * .5)))} m`;
+    let angulo = `Altitude: ${Math.abs(Math.round(canvasJogo.height - moduloLunar.posicao.y - (moduloLunar.altura * .5)))} m`;
 
     exibirIndicador(angulo, 40, 100);
 }
@@ -295,13 +423,13 @@ function exibirMensagemVitoria(pontuacaoCalculada) {
     let pontuacao = `PONTUAÇÃO: ${pontuacaoCalculada.pontuacao}`;
     let avisoRecorde = '-- NOVO RECORDE --';
 
-    exibirIndicador(mensagemVitoria, canvas.width / 2, (canvas.height / 2), 'center', 'cyan');
-    exibirIndicador(pontuacao, canvas.width / 2, (canvas.height / 2) + 20, 'center', 'cyan');
+    exibirIndicador(mensagemVitoria, canvasJogo.width / 2, (canvasJogo.height / 2), 'center', 'cyan');
+    exibirIndicador(pontuacao, canvasJogo.width / 2, (canvasJogo.height / 2) + 20, 'center', 'cyan');
 
     if (pontuacaoCalculada.novoRecorde) {
 
         configuracao.pontuacaoMaxima = pontuacaoCalculada.pontuacao;
-        exibirIndicador(avisoRecorde, canvas.width / 2, (canvas.height / 2) - 40, 'center', 'cyan', 'bold', '20px');
+        exibirIndicador(avisoRecorde, canvasJogo.width / 2, (canvasJogo.height / 2) - 40, 'center', 'cyan', 'bold', '20px');
     }
 }
 
@@ -316,28 +444,29 @@ function exibirMensagemFracasso(dadosAlunissagem) {
     const msgVelocidadeFinalX = `Velocidade horizontal: ${velocidadeFinalX} m/s`;
     const msgAnguloFinal = `Angulo final: ${anguloFinal}°`;
 
-    exibirIndicador(msgFracasso, canvas.width / 2, (canvas.height / 2) - 40, 'center', 'crimson', 'bold', '20px');
+    exibirIndicador(msgFracasso, canvasJogo.width / 2, (canvasJogo.height / 2) - 40, 'center', 'crimson', 'bold', '20px');
     
-    exibirIndicador(msgVelocidadeFinalY, canvas.width / 2, (canvas.height / 2), 'center', velocidadeFinalY > 5.0 ? 'crimson' : 'lightgray');
+    exibirIndicador(msgVelocidadeFinalY, canvasJogo.width / 2, (canvasJogo.height / 2), 'center', velocidadeFinalY > 5.0 ? 'crimson' : 'lightgray');
     
-    exibirIndicador(msgVelocidadeFinalX, canvas.width / 2, (canvas.height / 2) + 20, 'center', velocidadeFinalX > 5.0 ? 'crimson' : 'lightgray');
+    exibirIndicador(msgVelocidadeFinalX, canvasJogo.width / 2, (canvasJogo.height / 2) + 20, 'center', velocidadeFinalX > 5.0 ? 'crimson' : 'lightgray');
     
-    exibirIndicador(msgAnguloFinal, canvas.width / 2, (canvas.height / 2) + 40, 'center', anguloFinal > 3 ? 'crimson' : 'lightgray');
+    exibirIndicador(msgAnguloFinal, canvasJogo.width / 2, (canvasJogo.height / 2) + 40, 'center', anguloFinal > 3 ? 'crimson' : 'lightgray');
 }
 
 function exibirReiniciarJogo() {
 
     const msgReiniciar = 'Pressione ENTER para jogar';
-    exibirIndicador(msgReiniciar, canvas.width / 2, (canvas.height / 2) + 80, 'center');
+    exibirIndicador(msgReiniciar, canvasJogo.width / 2, (canvasJogo.height / 2) + 80, 'center');
 }
 
-function desenharTela() {
+function loopPrincipal() {
 
     if (!jogoAtivo) return;
 
-        // contexto.clearRect(0, 0, canvas.width, canvas.height);
+        ctxJogo.clearRect(0, 0, canvasJogo.width, canvasJogo.height);
 
-        desenharEstrelas(estrelas);
+        atualizarEstadoModulo();
+        desenharCenario();
         detectarContato();
         atracaoGravitacional();
         desenharModuloLunar();
@@ -347,7 +476,7 @@ function desenharTela() {
         exibirAltitude();
         exibirPontuacao();
 
-        requestAnimationFrame(desenharTela);
+        requestAnimationFrame(loopPrincipal);
 }
 
 function atracaoGravitacional() {
@@ -367,7 +496,7 @@ function atracaoGravitacional() {
 iniciarJogo();
 
 
-/*  Seção de controle */
+/*** CONTROLE ****/
 
 document.addEventListener('keydown', (e) => {
     switch (e.key) {
@@ -399,3 +528,10 @@ document.addEventListener('keyup', (e) => {
             break;
     }
 });
+
+
+function atualizarEstadoModulo() {
+    detectarQueimaMotor();
+    detectarRotacao();
+}
+
