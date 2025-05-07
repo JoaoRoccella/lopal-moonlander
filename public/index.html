@@ -1,20 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alunissagem</title>
     <style>
-        
+        @font-face {
+            font-family: 'JetBrains Mono';
+            src: url('fonts/JetBrainsMono/webfonts/JetBrainsMono-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'JetBrains Mono';
+            src: url('fonts/JetBrainsMono/webfonts/JetBrainsMono-Bold.woff2') format('woff2');
+            font-weight: bold;
+            font-style: normal;
+        }
+
         * {
             margin: 0;
         }
-        
-        img, canvas {
+
+        img,
+        canvas {
             display: block;
             width: 800px;
         }
-        
+
         canvas {
             position: absolute;
             top: 0;
@@ -36,11 +51,13 @@
         }
     </style>
 </head>
+
 <body>
     <canvas id="cenario" width="800" height="600"></canvas>
     <canvas id="jogo" width="800" height="600"></canvas>
     <img src="img/superficieLua.png" alt="Superfície da lua">
-    
+
     <script src="js/jogo_otimizado.js"></script>
 </body>
+
 </html>

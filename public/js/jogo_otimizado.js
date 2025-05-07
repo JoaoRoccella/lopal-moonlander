@@ -17,9 +17,6 @@ const contextoCenario = canvasCenario.getContext('2d');
 const canvasJogo = document.querySelector('#jogo');
 const ctxJogo = canvasJogo.getContext('2d');
 
-// Debug
-const DEBUG_FPS = false;
-
 // Medidas-base para os cálculos de posição e tamanhos
 const LARGURA = canvasCenario.width;
 const ALTURA = canvasCenario.height;
@@ -72,9 +69,11 @@ let moduloLunar = {
         x: inversao ? 700 : 100,
         y: 100,
     },
-    angulo: Math.PI * (inversao ? .25 : -.25),
+    angulo: Math.PI * (inversao ? 0.25 : -0.25),
     largura: 30,
     altura: 30,
+    metadeLargura: 15,
+    metadeAltura: 15,
     cor: 'lightgray',
     motorLigado: false,
     rotacaoNegativa: false,
@@ -191,13 +190,13 @@ function detectarRotacao() {
 
 function detectarContato() {
 
-    if (moduloLunar.posicao.y > (ALTURA - moduloLunar.altura * .5)) {
+    if (moduloLunar.posicao.y > (ALTURA - moduloLunar.altura * 0.5)) {
 
         let dadosAlunissagem;
 
         if (
-            Math.abs(moduloLunar.velocidade.y) > .5 ||
-            Math.abs(moduloLunar.velocidade.x) > .5 ||
+            Math.abs(moduloLunar.velocidade.y) > 0.5 ||
+            Math.abs(moduloLunar.velocidade.x) > 0.5 ||
             Math.abs(Math.round(moduloLunar.angulo * RAD2DEG) % 360) > 3) {
 
             colisao = true;
@@ -270,7 +269,7 @@ function iniciarJogo() {
     moduloLunar.velocidade.y = 0;
     moduloLunar.combustivel = moduloLunar.combustivelInicial;
     moduloLunar.motorLigado = false;
-    moduloLunar.angulo = Math.PI * (inversao ? .25 : -.25);
+    moduloLunar.angulo = Math.PI * (inversao ? 0.25 : -0.25);
     moduloLunar.rotacaoNegativa = false;
     moduloLunar.rotacaoPositiva = false;
 
@@ -302,10 +301,9 @@ function loopPrincipal(timestamp) {
     exibirAngulo();
     exibirAltitude();
     exibirPontuacao();
-    if (DEBUG_FPS) {
-        exibirDeltaTime(delta);
-        simularCarga(20); // simula 10ms de travamento por frame
-    }
+
+    /* exibirDeltaTime(delta);
+    simularCarga(20); // simula 10ms de travamento por frame */
 
     requestAnimationFrame(loopPrincipal);
 }
@@ -321,7 +319,7 @@ function desenharModuloLunar() {
         desenharChama();
     }
 
-    ctxJogo.drawImage(imagemLander, -moduloLunar.largura / 2, -moduloLunar.altura / 2, moduloLunar.largura, moduloLunar.altura);
+    ctxJogo.drawImage(imagemLander, -moduloLunar.metadeLargura, -moduloLunar.metadeAltura, moduloLunar.largura, moduloLunar.altura);
     // ctxJogo.closePath();
     ctxJogo.restore();
 
@@ -332,15 +330,15 @@ function desenharModuloLunar() {
 function desenharChama() {
 
     ctxJogo.beginPath();
-    ctxJogo.moveTo((moduloLunar.largura * -.5) + 10, (moduloLunar.altura * .5) - 5);
-    ctxJogo.lineTo((moduloLunar.largura * .5) - 10, (moduloLunar.altura * .5) - 5);
-    ctxJogo.lineTo(0, moduloLunar.altura * .5 + Math.random() * moduloLunar.tamanhoChama);
+    ctxJogo.moveTo(-5, 10);
+    ctxJogo.lineTo(5, 10);
+    ctxJogo.lineTo(0, 15 + Math.random() * moduloLunar.tamanhoChama);
     ctxJogo.closePath();
     ctxJogo.fillStyle = 'orange';
     ctxJogo.fill();
 }
 
-function exibirIndicador(indicador, posicaoX, posicaoY, textAlign = 'left', color = 'lightgray', fontWeight = 'bold', fontSize = '18px', fontFamily = 'Consolas', textBaseline = 'middle') {
+function exibirIndicador(indicador, posicaoX, posicaoY, textAlign = 'left', color = 'lightgray', fontWeight = 'normal', fontSize = '16px', fontFamily = '"JetBrains Mono", monospace', textBaseline = 'middle') {
 
     // contexto.save()
     ctxJogo.font = `${fontWeight} ${fontSize} ${fontFamily}`;
@@ -376,7 +374,7 @@ function exibirAngulo() {
 
 function exibirAltitude() {
 
-    let angulo = `Altitude: ${Math.abs(Math.round(ALTURA - moduloLunar.posicao.y - (moduloLunar.altura * .5)))} m`;
+    let angulo = `Altitude: ${Math.abs(Math.round(ALTURA - moduloLunar.posicao.y - (moduloLunar.altura * 0.5)))} m`;
 
     exibirIndicador(angulo, 40, 100);
 }
@@ -442,10 +440,8 @@ function exibirDeltaTime(delta) {
 
 function simularCarga(peso = 5) {
     const inicio = performance.now();
-    while (performance.now() - inicio < peso) {} // ocupa CPU por X ms
+    while (performance.now() - inicio < peso) { } // ocupa CPU por X ms
 }
-
-
 
 function exibirTelaInicial() {
 
