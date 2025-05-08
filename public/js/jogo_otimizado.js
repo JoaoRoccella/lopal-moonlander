@@ -39,9 +39,6 @@ const ctxOff = offscreen.getContext('2d');
 let frameAtual = 0;
 const INTERVALO_REDESENHO_FUNDO = 3;
 
-// Controle de FPS responsivo 
-let ultimaAtualizacaoFrame = 0;
-
 // Estrelas da rodada
 let estrelas = criarEstrelas();
 
@@ -143,31 +140,31 @@ function desenharCenario() {
 
 // Funções de Física e Atualização do Módulo
 
-function atualizarEstadoModulo(delta = 1) {
+function atualizarEstadoModulo() {
 
-    detectarAcionamentoMotor(delta);
+    detectarAcionamentoMotor();
     detectarRotacao();
 }
 
-function atracaoGravitacional(delta = 1) {
+function atracaoGravitacional() {
 
-    moduloLunar.posicao.x += moduloLunar.velocidade.x * delta;
-    moduloLunar.posicao.y += moduloLunar.velocidade.y * delta;
+    moduloLunar.posicao.x += moduloLunar.velocidade.x;
+    moduloLunar.posicao.y += moduloLunar.velocidade.y;
     if (moduloLunar.motorLigado) {
 
-        moduloLunar.velocidade.y -= moduloLunar.aceleracao * Math.cos(moduloLunar.angulo) * delta;
-        moduloLunar.velocidade.x += moduloLunar.aceleracao * Math.sin(moduloLunar.angulo) * delta;
+        moduloLunar.velocidade.y -= moduloLunar.aceleracao * Math.cos(moduloLunar.angulo);
+        moduloLunar.velocidade.x += moduloLunar.aceleracao * Math.sin(moduloLunar.angulo);
 
     }
     moduloLunar.velocidade.y += configuracao.aceleracaoGravidadeLunar;
 
 }
 
-function detectarAcionamentoMotor(delta = 1) {
+function detectarAcionamentoMotor() {
 
     if (moduloLunar.motorLigado && moduloLunar.combustivel > 0) {
 
-        moduloLunar.combustivel -= moduloLunar.razaoConsumoCombustivel * delta;
+        moduloLunar.combustivel -= moduloLunar.razaoConsumoCombustivel;
 
     } else {
 
@@ -277,33 +274,26 @@ function iniciarJogo() {
     jogoAtivo = true;
     estrelas = criarEstrelas();
 
-    ultimaAtualizacaoFrame = performance.now(); // evita pulo no 1º frame
     requestAnimationFrame(loopPrincipal);
 
 }
 
-function loopPrincipal(timestamp) {
+function loopPrincipal() {
 
     if (!jogoAtivo) return;
 
-    const delta = (timestamp - ultimaAtualizacaoFrame) / 16.67; // normaliza para ~60FPS
-    ultimaAtualizacaoFrame = timestamp;
-
     ctxJogo.clearRect(0, 0, LARGURA, ALTURA);
 
-    atualizarEstadoModulo(delta);
+    atualizarEstadoModulo();
     desenharCenario();
     detectarContato();
-    atracaoGravitacional(delta);
+    atracaoGravitacional();
     desenharModuloLunar();
     exibirVelocidade();
     exibirCombustivel();
     exibirAngulo();
     exibirAltitude();
     exibirPontuacao();
-
-    /* exibirDeltaTime(delta);
-    simularCarga(20); // simula 10ms de travamento por frame */
 
     requestAnimationFrame(loopPrincipal);
 }
@@ -431,16 +421,6 @@ function exibirReiniciarJogo() {
 function exibirIniciarJogo() {
     const msgIniciar = 'Pressione ENTER para jogar';
     exibirIndicador(msgIniciar, CENTRO_HORIZONTAL, CENTRO_VERTICAL + 20, 'center')
-}
-
-function exibirDeltaTime(delta) {
-    const texto = `Δt: ${(delta * 16.67).toFixed(1)} ms`;
-    exibirIndicador(texto, 40, 120, 'left', 'yellow');
-}
-
-function simularCarga(peso = 5) {
-    const inicio = performance.now();
-    while (performance.now() - inicio < peso) { } // ocupa CPU por X ms
 }
 
 function exibirTelaInicial() {
