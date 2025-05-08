@@ -1,11 +1,8 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-// const { Gpio } = require('onoff');
-// const WebSocket = require('ws');
 
-
-// === Servidor Web ===
+//*** Servidor Web ***//
 
 const server = http.createServer((req, res) => {
     let filePath = './public' + (req.url === '/' ? '/index.html' : req.url);
@@ -34,53 +31,7 @@ const server = http.createServer((req, res) => {
 });
 
 
-// === Servidor WebSocket ===
-
-/* const wss = new WebSocket.Server({ server });
-
-let socket = null;
-wss.on('connection', ws => {
-    console.log('Cliente WebSocket conectado');
-    socket = ws;
-}); */
-
-
-// === GPIO: Botões físicos ===
-
-/* const btnDir = new Gpio(5, 'in', 'rising', { debounceTimeout: 10 });
-const btnEsq = new Gpio(6, 'in', 'rising', { debounceTimeout: 10 });
-const btnThrust = new Gpio(13, 'in', 'rising', { debounceTimeout: 10 });
-
-function enviarComando(comando) {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({ acao: comando }));
-    }
-}
-
-btnDir.watch((err, value) => {
-    if (err) throw err;
-    enviarComando('giro_direita');
-});
-
-btnEsq.watch((err, value) => {
-    if (err) throw err;
-    enviarComando('giro_esquerda');
-});
-
-btnThrust.watch((err, value) => {
-    if (err) throw err;
-    enviarComando('propulsor');
-});
-
-process.on('SIGINT', () => {
-    btnDir.unexport();
-    btnEsq.unexport();
-    btnThrust.unexport();
-    process.exit();
-}); */
-
-
-// === Iniciar servidor ===
+//*** Iniciar servidor ***//
 
 const PORT = 8050;
 server.listen(PORT, () => {
