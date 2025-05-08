@@ -1,8 +1,8 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { Gpio } = require('onoff');
-const WebSocket = require('ws');
+// const { Gpio } = require('onoff');
+// const WebSocket = require('ws');
 
 
 // === Servidor Web ===
@@ -36,13 +36,13 @@ const server = http.createServer((req, res) => {
 
 // === Servidor WebSocket ===
 
-const wss = new WebSocket.Server({ server });
+/* const wss = new WebSocket.Server({ server });
 
 let socket = null;
 wss.on('connection', ws => {
     console.log('Cliente WebSocket conectado');
     socket = ws;
-});
+}); */
 
 
 // === GPIO: Botões físicos ===
