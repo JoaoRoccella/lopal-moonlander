@@ -328,7 +328,7 @@ function desenharChama() {
     ctxJogo.fill();
 }
 
-function exibirIndicador(indicador, posicaoX, posicaoY, textAlign = 'left', color = 'lightgray', fontWeight = 'normal', fontSize = '16px', fontFamily = '"JetBrains Mono", monospace', textBaseline = 'middle') {
+function exibirIndicador(indicador, posicaoX, posicaoY, textAlign = 'left', color = 'lightgray', fontWeight = 'normal', fontSize = '16px', fontFamily = '"Ubuntu Mono", monospace', textBaseline = 'middle') {
 
     // contexto.save()
     ctxJogo.font = `${fontWeight} ${fontSize} ${fontFamily}`;
