@@ -418,12 +418,12 @@ function exibirMensagemFracasso(dadosAlunissagem) {
 
 function exibirReiniciarJogo() {
 
-    const msgReiniciar = 'Pressione ENTER para jogar novamente';
+    const msgReiniciar = `Pressione ${navigator.gamepads ? 'START' : 'ENTER'} para jogar novamente`;
     exibirIndicador(msgReiniciar, CENTRO_HORIZONTAL, CENTRO_VERTICAL + 80, 'center');
 }
 
 function exibirIniciarJogo() {
-    const msgIniciar = 'Pressione ENTER para jogar';
+    const msgIniciar = `Pressione ${navigator.gamepads ? 'START' : 'ENTER'} para jogar`;
     exibirIndicador(msgIniciar, CENTRO_HORIZONTAL, CENTRO_VERTICAL + 20, 'center')
 }
 
