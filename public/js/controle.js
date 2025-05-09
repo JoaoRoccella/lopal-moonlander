@@ -1,13 +1,18 @@
+let gamepadConectado = false;
+
 window.addEventListener("gamepadconnected", (e) => {
+    gamepadConectado = true;
     console.log("Gamepad conectado:", e.gamepad);
     loopGamepad();
 });
 
 window.addEventListener("gamepaddisconnected", (e) => {
+    gamepadConectado = false;
     console.log("Gamepad desconectado:", e.gamepad);
 });
 
 function loopGamepad() {
+    
     const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
 
     if (gamepads[0]) {

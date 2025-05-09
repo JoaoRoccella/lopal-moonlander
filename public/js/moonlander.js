@@ -289,7 +289,7 @@ function loopPrincipal() {
     ctxJogo.clearRect(0, 0, LARGURA, ALTURA);
 
     atualizarEstadoModulo();
-    desenharCenario();
+    // desenharCenario();
     detectarContato();
     atracaoGravitacional();
     desenharModuloLunar();
@@ -301,6 +301,13 @@ function loopPrincipal() {
 
     requestAnimationFrame(loopPrincipal);
 }
+
+function loopCenario() {
+    desenharCenario();
+    requestAnimationFrame(loopCenario);
+}
+
+loopCenario();
 
 function desenharModuloLunar() {
 
@@ -402,7 +409,7 @@ function exibirMensagemFracasso(dadosAlunissagem) {
     const velocidadeFinalX = Math.abs(Number(10 * dadosAlunissagem.velocidadeFinal.x).toFixed(2));
     const anguloFinal = Math.abs(Number(dadosAlunissagem.angulo * RAD2DEG).toFixed(1) % 360);
 
-    const msgFracasso = `VOCÊ VIROU POEIRA ESPACIAL 😵`;
+    const msgFracasso = `VOCÊ VIROU POEIRA ESPACIAL x_x`;
     const msgVelocidadeFinalY = `Velocidade vertical: ${velocidadeFinalY} m/s`;
     const msgVelocidadeFinalX = `Velocidade horizontal: ${velocidadeFinalX} m/s`;
     const msgAnguloFinal = `Angulo final: ${anguloFinal}°`;
@@ -418,12 +425,12 @@ function exibirMensagemFracasso(dadosAlunissagem) {
 
 function exibirReiniciarJogo() {
 
-    const msgReiniciar = `Pressione ${navigator.gamepads ? 'START' : 'ENTER'} para jogar novamente`;
+    const msgReiniciar = `Pressione ${gamepadConectado ? 'START' : 'ENTER'} para jogar novamente`;
     exibirIndicador(msgReiniciar, CENTRO_HORIZONTAL, CENTRO_VERTICAL + 80, 'center');
 }
 
 function exibirIniciarJogo() {
-    const msgIniciar = `Pressione ${navigator.gamepads ? 'START' : 'ENTER'} para jogar`;
+    const msgIniciar = `Pressione ${gamepadConectado ? 'START' : 'ENTER'} para jogar`;
     exibirIndicador(msgIniciar, CENTRO_HORIZONTAL, CENTRO_VERTICAL + 20, 'center')
 }
 
