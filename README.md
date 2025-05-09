@@ -18,3 +18,5 @@ Configurado para o controle USB gamepad _(Vendor: 081f Product: e401) - SNES_
 - _X_ : acionar motor
 - _Left (L)_ : rotacionar sentido anti-horário
 - _Right (R)_ : rotacionar sentido horário
+
+![Controle do SNES](./public/img/controle-snes.png)
