@@ -165,10 +165,12 @@ function detectarAcionamentoMotor() {
     if (moduloLunar.motorLigado && moduloLunar.combustivel > 0) {
 
         moduloLunar.combustivel -= moduloLunar.razaoConsumoCombustivel;
+        ligarSomMotor();
 
     } else {
 
         moduloLunar.motorLigado = false;
+        desligarSomMotor();
     }
 
 }
@@ -196,6 +198,7 @@ function detectarContato() {
             Math.abs(moduloLunar.velocidade.x) > 0.5 ||
             Math.abs(Math.round(moduloLunar.angulo * RAD2DEG) % 360) > 3) {
 
+            tocarSomExplosao();
             colisao = true;
             dadosAlunissagem = obterDadosAlunissagem(moduloLunar);
             exibirMensagemFracasso(dadosAlunissagem);
@@ -248,6 +251,7 @@ function calcularPontuacao(moduloLunar) {
 function finalizarJogo() {
 
     jogoAtivo = false;
+    desligarSomMotor();
 
     moduloLunar.velocidade = { x: 0, y: 0 };
     moduloLunar.motorLigado = false;
