@@ -4,6 +4,17 @@ Desenvolvimento do joguinho de alunissagem para treino das habilidades em JavaSc
 
 **Jogue aqui**: <https://joaoroccella.github.io/lopal-moonlander/>
 
-Imagem do módulo lunar: <https://www.flaticon.com/br/icone-gratis/lander_4698816?term=lander&related_id=4698816>
+Controles no teclado:
 
-Imagem da superfície da lua: <>
+- ⬆ : acionar motor<br>
+- ⬅ : rotacione sentido anti-horário<br>
+- ➡ : rotacione sentido horário
+
+Você também pode jogar com um controle ou joystick USB, configurando o arquivo `controle.js` com os botões detectados do seu periférico (Gamepad API do HTML5). 
+
+Confira o mapeamento dos botões do seu controle aqui: <https://hardwaretester.com/gamepad>
+
+Configurado para o controle USB gamepad _(Vendor: 081f Product: e401) - SNES_
+- _X_ : acionar motor
+- _Left (L)_ : rotacionar sentido anti-horário
+- _Right (R)_ : rotacionar sentido horário
