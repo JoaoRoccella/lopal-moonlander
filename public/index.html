@@ -9,22 +9,25 @@
 
     <style>
         * { margin: 0 }
-        body { width: 100dvw; height: 100dvh; display: flex; justify-content: center; }
+        body { height: 100dvh; display: grid; place-items: center }
+        main { width: 100dvw; height: 100dvh; display: flex; justify-content: center }
         img, canvas { display: block; width: 800px }
-        canvas { position: absolute; top: 0 }
+        canvas { position: absolute; top: calc(50dvh - 325px) }
         #cenario { z-index: 0 }
         #jogo { z-index: 1 }
-        img { position: absolute; top: 600px; z-index: 2}
+        img { position: absolute; top: calc(50dvh + 275px); z-index: 2 }
     </style>
 </head>
 
 <body>
-    <canvas id="cenario" width="800" height="600"></canvas>
-    <canvas id="jogo" width="800" height="600"></canvas>
-    <img src="img/superficieLua.png" alt="Superfície da lua">
-    <script src="js/audio.js"></script>
-    <script src="js/controle.js"></script>
-    <script src="js/moonlander.js"></script>
+    <main>
+        <canvas id="cenario" width="800" height="600"></canvas>
+        <canvas id="jogo" width="800" height="600"></canvas>
+        <img src="img/superficieLua.png" alt="Superfície da lua">
+        <script src="js/audio.js"></script>
+        <script src="js/controle.js"></script>
+        <script src="js/moonlander.js"></script>
+    </main>
 </body>
 
 </html>
