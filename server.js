@@ -4,8 +4,8 @@ const path = require('path');
 
 //*** Servidor Web ***//
 
-const server = http.createServer((req, res) => {
-    let filePath = './public' + (req.url === '/' ? '/index.html' : req.url);
+const server = http.createServer((request, response) => {
+    let filePath = './public' + (request.url === '/' ? '/index.html' : request.url);
     const extname = String(path.extname(filePath)).toLowerCase();
     const mimeTypes = {
         '.html': 'text/html',
@@ -21,11 +21,15 @@ const server = http.createServer((req, res) => {
 
     fs.readFile(filePath, (error, content) => {
         if (error) {
-            res.writeHead(404);
-            res.end(`Arquivo não encontrado: ${filePath}`);
+            response.writeHead(404, { 'Content-Type': 'text/plain' });
+            response.end(`Arquivo não encontrado: ${filePath}`);
+            
+            console.log(`[${new Date().toISOString()}] ${request.method} ${request.url} -> 404 (Arquivo não encontrado)`);
         } else {
-            res.writeHead(200, { 'Content-Type': contentType });
-            res.end(content, 'utf-8');
+            response.writeHead(200, { 'Content-Type': contentType });
+            response.end(content, 'utf-8');
+            
+            console.log(`[${new Date().toISOString()}] ${request.method} ${request.url} -> 200 (${contentType})`);
         }
     });
 });
